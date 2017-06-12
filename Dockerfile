@@ -1,15 +1,5 @@
-# To deploy this container directly from Docker Hub, use:
-#
-#        docker run --cap-drop=all --name boringnginx -d -p 80:8080 ajhaydock/boringnginx
-#
-# To build and run this container locally, try a command like:
-#
-#        docker build -t boringnginx .
-#        docker run --cap-drop=all --name boringnginx -d -p 80:8080 boringnginx
-#
-
 FROM alpine
-MAINTAINER Alex Haydock <alex@alexhaydock.co.uk>
+MAINTAINER Yahya Fadhlulloh Al Fatih <yahya.kimochi@gmail.com>
 
 # Nginx Version (See: https://nginx.org/en/CHANGES)
 ENV NGXVERSION 1.13.0
@@ -47,7 +37,19 @@ RUN apk --no-cache --update add \
       wget \
       zlib-dev \
       openssl-dev \
-      gzip
+      gzip \
+      nano \
+      top htop \
+      alpine-sdk bash \
+      curl zlib-dev \
+      util-linux-dev libmnl-dev \
+      autoconf automake \
+      pkgconfig python logrotate \
+      nodejs 
+
+RUN git clone https://github.com/firehol/netdata.git --depth=1 "$HOME/netdata"
+
+RUN sh $HOME/netdata-installer.sh
 
 # Copy nginx source into container
 COPY src/nginx-$NGXVERSION.tar.gz nginx-$NGXVERSION.tar.gz
@@ -80,13 +82,17 @@ RUN git clone https://github.com/openresty/headers-more-nginx-module.git "$HOME/
     git clone https://github.com/simpl/ngx_devel_kit.git "$HOME/ngx_devel_kit" && \
     git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git "$HOME/ngx_subs_filter" && \
     git clone https://github.com/vozlt/nginx-module-vts.git "$HOME/nginx-module-vts" && \
-    git clone https://github.com/nbs-system/naxsi.git "$HOME/nginx-naxsi"
+    git clone https://github.com/nbs-system/naxsi.git "$HOME/nginx-naxsi" && \
+    git clone https://github.com/tmthrgd/nginx-ip-blocker.git "$HOME/nginx-ip-blocker" && \
+    git clone https://github.com/masterzen/nginx-upload-progress-module.git "$HOME/nginx-upload"
 
 # Prepare nginx source
 RUN tar -xzvf nginx-$NGXVERSION.tar.gz && \
     rm -v nginx-$NGXVERSION.tar.gz
 
-COPY src/ngx_http_header_filter_module.c /root/nginx-$NGXVERSION/src/http/ngx_http_header_filter_module.c
+RUN rm /root/nginx-$NGXVERSION/src/http/ngx_http_header_filter_module.c
+
+COPY src/ngx_http_header_filter_module.c /root/nginx-$NGXVERSION/src/http/
 
 # Switch directory
 WORKDIR "/root/nginx-$NGXVERSION/"
@@ -150,7 +156,9 @@ RUN ./configure \
         --add-module="$HOME/ngx_devel_kit" \
         --add-module="$HOME/ngx_subs_filter" \
         --add-module="$HOME/nginx-module-vts" \
-        --add-module="$HOME/nginx-naxsi/naxsi_src"
+        --add-module="$HOME/nginx-naxsi/naxsi_src" \
+        --add-module="$HOME/nginx-ip-blocker" \
+        --add-module="$HOME/nginx-upload"
 
 # Build Nginx
 RUN patch -p1 < "$HOME/nginx.patch" && \
