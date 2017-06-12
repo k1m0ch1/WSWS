@@ -39,18 +39,8 @@ RUN apk --no-cache --update add \
       openssl-dev \
       gzip \
       nano \
-      top htop \
-      alpine-sdk bash \
-      curl zlib-dev \
-      util-linux-dev libmnl-dev \
-      autoconf automake \
-      pkgconfig python logrotate \
-      nodejs 
-
-RUN git clone https://github.com/firehol/netdata.git --depth=1 "$HOME/netdata"
-
-RUN sh $HOME/netdata-installer.sh
-
+      htop 
+      
 # Copy nginx source into container
 COPY src/nginx-$NGXVERSION.tar.gz nginx-$NGXVERSION.tar.gz
 COPY src/nginx.patch nginx.patch
