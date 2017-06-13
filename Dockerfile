@@ -174,6 +174,52 @@ RUN apk del \
       go \
       make
 
+# Clean-up
+    cd && \
+    apk del .build-deps && \
+    rm -rf /tmp/* && \
+    # Forward request and error logs to docker log collector
+    ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log && \
+    # Make PageSpeed cache writable
+    mkdir -p /var/cache/ngx_pagespeed /var/log/pagespeed && \
+    chmod -R 777 /var/cache/ngx_pagespeed && chmod -R 777 /var/log/pagespeed \
+    && rm -rf /etc/nginx/html/ \
+    && mkdir -p /usr/share/nginx/html/ 
+
+RUN apk --no-cache add php7 php7-fpm php7-mysqli \
+    php7-json php7-openssl php7-curl \
+    php7-zlib php7-xml php7-phar \
+    php7-intl php7-dom php7-xmlreader \
+    php7-ctype php7-mbstring php7-gd \
+    php7-mcrypt php7-soap php7-gmp\
+    php7-pdo_odbc php7-dom php7-pdo \
+    php7-zip php7-mysqli \
+    php7-sqlite3 php7-apcu php7-odbc \
+    php7-imagick php7-pdo_pgsql php7-pgsql \
+    php7-bcmath phfgp7-ldap \
+    php7-pdo_mysql php7-pdo_sqlite php7-gettext \
+    php7-xmlrpc php7-bz2 \
+    php7-iconv \
+    php7-pdo_dblib php7-dev php7-ctype \
+    php7-common php7-pear php7-wddx \
+    php7-xsl php7-ftp php7-phar \
+    php7-posix php7-shmop php7-sockets \
+    php7-exif php7-phpdbg \
+    php7-opcache \
+    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/ \
+    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/
+
+RUN apk add --no-cache bash build-base wget curl m4 autoconf libtool imagemagick imagemagick-dev zlib zlib-dev libcurl curl-dev libevent libevent-dev libidn libmemcached libmemcached-dev libidn-dev && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+COPY config/nginx/conf.d /etc/nginx/conf.d
+COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY html /usr/share/nginx/html
+VOLUME ["/var/cache/ngx_pagespeed","/app"]
+
+RUN echo "export TERM=xterm" > /root/.bashrc
+RUN echo 'PS1="\[\033[35m\]\t\[\033[m\]-\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ "' >> /root/.bashrc
+
 # Print built version
 RUN nginx -V
 
