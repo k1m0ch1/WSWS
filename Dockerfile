@@ -39,7 +39,8 @@ RUN apk --no-cache --update add \
       openssl-dev \
       gzip \
       nano \
-      htop 
+      htop \
+      zsh
       
 # Copy nginx source into container
 COPY src/nginx-$NGXVERSION.tar.gz nginx-$NGXVERSION.tar.gz
@@ -175,9 +176,7 @@ RUN apk del \
       make
 
 # Clean-up
-    cd && \
-    apk del .build-deps && \
-    rm -rf /tmp/* && \
+RUN rm -rf /tmp/* && \
     # Forward request and error logs to docker log collector
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
@@ -197,7 +196,7 @@ RUN apk --no-cache add php7 php7-fpm php7-mysqli \
     php7-zip php7-mysqli \
     php7-sqlite3 php7-apcu php7-odbc \
     php7-imagick php7-pdo_pgsql php7-pgsql \
-    php7-bcmath phfgp7-ldap \
+    php7-bcmath php7-ldap \
     php7-pdo_mysql php7-pdo_sqlite php7-gettext \
     php7-xmlrpc php7-bz2 \
     php7-iconv \
@@ -212,13 +211,12 @@ RUN apk --no-cache add php7 php7-fpm php7-mysqli \
 
 RUN apk add --no-cache bash build-base wget curl m4 autoconf libtool imagemagick imagemagick-dev zlib zlib-dev libcurl curl-dev libevent libevent-dev libidn libmemcached libmemcached-dev libidn-dev && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-COPY config/nginx/conf.d /etc/nginx/conf.d
-COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
+#COPY config/nginx/conf.d /etc/nginx/conf.d
+#COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY html /usr/share/nginx/html
 VOLUME ["/var/cache/ngx_pagespeed","/app"]
 
-RUN echo "export TERM=xterm" > /root/.bashrc
-RUN echo 'PS1="\[\033[35m\]\t\[\033[m\]-\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ "' >> /root/.bashrc
+RUN chsh -s 'which zsh'
 
 # Print built version
 RUN nginx -V

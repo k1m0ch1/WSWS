@@ -10,3 +10,4 @@ Nginx module installed
 Things to do
 - Benchmarking
 - Document Cleaning
+- fixing php-fpm
