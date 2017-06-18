@@ -48,7 +48,8 @@ RUN apk --no-cache --update add \
       libjpeg-turbo \
       openssl \
       python \
-      openssl-dev
+      openssl-dev \
+      supervisor 
 
 # Copy nginx source into container
 COPY src/nginx-$NGXVERSION.tar.gz nginx-$NGXVERSION.tar.gz
@@ -223,6 +224,7 @@ RUN apk add --no-cache bash build-base wget curl m4 autoconf libtool imagemagick
 COPY config/nginx/conf.d /etc/nginx/conf.d
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY html /usr/share/nginx/html
+COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 VOLUME ["/var/cache/ngx_pagespeed","/app"]
 
 COPY config/php7/php-fpm.conf /etc/php7/php-fpm.conf
@@ -233,8 +235,12 @@ RUN chmod -R 777 /var/log/
 RUN nginx -V
 
 # Launch Nginx in container as non-root
-USER nginx
-WORKDIR /usr/share/nginx
+
+#USER nginx
+#WORKDIR /usr/share/nginx
+
+WORKDIR /root
 
 # Launch command
-CMD ["nginx", "-g", "daemon off;"]
+#CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
