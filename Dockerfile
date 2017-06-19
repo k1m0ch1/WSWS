@@ -13,9 +13,7 @@ USER root
 WORKDIR /root
 
 # Add 'nginx' user
-RUN adduser nginx -S -u 666  -h /usr/share/nginx -H
-
-RUN adduser -D phpfpm
+RUN adduser -D nginx && adduser -D phpfpm
 
 # Update & install deps
 RUN apk --no-cache --update add \
