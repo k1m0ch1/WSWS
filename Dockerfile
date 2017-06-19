@@ -69,11 +69,11 @@ RUN wget "https://nginx.org/download/nginx-$NGXVERSION.tar.gz.asc" && \
 ##     --add-module="$HOME/ngx_pagespeed-$PSPDVER" \
 ## to the nginx configure arguments. Some patching will also be required.)
 ##
-RUN echo "Downloading PageSpeed..." && wget -O - https://github.com/pagespeed/ngx_pagespeed/archive/$PSPDVER.tar.gz | tar -xz && \
-    cd ngx_pagespeed-$PSPDVER/ && \
-    echo "Downloading PSOL..." && \
-    PSOLVER=$(basename $(cat PSOL_BINARY_URL) | cut -d"-" -f1) && \
-    wget -O - https://dl.google.com/dl/page-speed/psol/$PSOLVER-x64.tar.gz | tar -xz
+#RUN echo "Downloading PageSpeed..." && wget -O - https://github.com/pagespeed/ngx_pagespeed/archive/$PSPDVER.tar.gz | tar -xz && \
+#    cd ngx_pagespeed-$PSPDVER/ && \
+#    echo "Downloading PSOL..." && \
+#    PSOLVER=$(basename $(cat PSOL_BINARY_URL) | cut -d"-" -f1) && \
+#    wget -O - https://dl.google.com/dl/page-speed/psol/$PSOLVER-x64.tar.gz | tar -xz
 
 
 # Download additional modules
@@ -217,7 +217,8 @@ RUN apk --no-cache add php7 php7-fpm php7-mysqli \
     --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/ \
     --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/
 
-RUN apk add --no-cache bash build-base wget curl m4 autoconf libtool imagemagick imagemagick-dev zlib zlib-dev libcurl curl-dev libevent libevent-dev libidn libmemcached libmemcached-dev libidn-dev && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#RUN apk add --no-cache bash build-base wget curl m4 autoconf libtool imagemagick imagemagick-dev zlib zlib-dev libcurl curl-dev libevent libevent-dev libidn libmemcached libmemcached-dev libidn-dev
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 COPY config/nginx/conf.d /etc/nginx/conf.d
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
