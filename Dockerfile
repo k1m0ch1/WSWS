@@ -44,7 +44,6 @@ RUN apk --no-cache --update add \
       apr-util \
       libuuid \
       libjpeg-turbo \
-      openssl \
       python \
       openssl-dev \
       supervisor 
@@ -90,7 +89,6 @@ RUN tar -xzvf nginx-$NGXVERSION.tar.gz && \
     rm -v nginx-$NGXVERSION.tar.gz
 
 RUN rm /root/nginx-$NGXVERSION/src/http/ngx_http_header_filter_module.c
-
 COPY src/ngx_http_header_filter_module.c /root/nginx-$NGXVERSION/src/http/
 
 # Switch directory
@@ -223,6 +221,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY config/nginx/conf.d /etc/nginx/conf.d
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY html /usr/share/nginx/html
+COPY config/nginx/naxsi /etc/nginx/naxsi
 COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 VOLUME ["/var/cache/ngx_pagespeed","/app"]
 
