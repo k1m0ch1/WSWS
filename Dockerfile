@@ -171,7 +171,7 @@ RUN chown -R nginx /usr/share/nginx && \
     chown nginx /var/run/nginx.pid
 
 # Configure nginx to listen on 8080 instead of 80 (we can't bind to <1024 as non-root)
-RUN perl -pi -e 's,80;,8080;,' /etc/nginx/nginx.conf
+RUN perl -pi -e 's,80;,80;,' /etc/nginx/nginx.conf
 
 # Remove some packages (Doesn't save space because of container's CoW design, but might add a bit of security)
 RUN apk del \
